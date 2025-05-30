@@ -18,6 +18,8 @@ import { FiltrosComponent } from '../filtros/filtros.component';
 export class ListaJuegosComponent implements OnInit {
   juegos$!: Observable<Juego[]>;
   juegosFiltrados$!: Observable<Juego[]>;
+  ordenSeleccionado = '';
+
   
   private filtrosSubject = new BehaviorSubject<any>({
     busqueda: '',
@@ -40,7 +42,7 @@ export class ListaJuegosComponent implements OnInit {
   ngOnInit(): void {
     this.juegos$ = this.juegosService.obtenerJuegos();
     
-    // Verificar si viene de una categoría específica
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.categoriaSeleccionada = params['id'];
@@ -48,7 +50,7 @@ export class ListaJuegosComponent implements OnInit {
       }
     });
     
-    // Combinar juegos con filtros
+ 
     this.juegosFiltrados$ = combineLatest([
       this.juegos$,
       this.filtros$
@@ -56,7 +58,7 @@ export class ListaJuegosComponent implements OnInit {
       map(([juegos, filtros]) => {
         let resultado = juegos;
         
-        // Filtro por búsqueda
+  
         if (filtros.busqueda) {
           resultado = resultado.filter(juego =>
             juego.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
@@ -65,28 +67,24 @@ export class ListaJuegosComponent implements OnInit {
           );
         }
         
-        // Filtro por categoría
         if (filtros.categoria) {
           resultado = resultado.filter(juego =>
             juego.categoria.toLowerCase() === filtros.categoria.toLowerCase()
           );
         }
         
-        // Filtro por plataforma
         if (filtros.plataforma) {
           resultado = resultado.filter(juego =>
             juego.plataformas.includes(filtros.plataforma)
           );
         }
         
-        // Filtro por precio
         if (filtros.precio === 'gratis') {
           resultado = resultado.filter(juego => juego.esGratis);
         } else if (filtros.precio === 'pago') {
           resultado = resultado.filter(juego => !juego.esGratis);
         }
         
-        // Filtro por rating
         if (filtros.rating > 0) {
           resultado = resultado.filter(juego => juego.rating >= filtros.rating);
         }

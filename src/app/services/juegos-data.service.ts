@@ -1,3 +1,11 @@
+interface Estadisticas {
+  totalJuegos: number;
+  juegosGratis: number;
+  juegosPago: number;
+  mejorRating: { nombre: string; rating: number };
+  promedioPrecio: number;
+}
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, map } from 'rxjs';
@@ -86,4 +94,32 @@ export class JuegosDataService {
       )
     );
   }
+  getJuegosPorPrecio(min: number, max: number): Observable<Juego[]> {
+    return this.obtenerJuegos().pipe(
+      map(juegos => juegos.filter(j => j.precio >= min && j.precio <= max))
+    );
+  }
+  getEstadisticas(): Observable<Estadisticas> {
+    return this.obtenerJuegos().pipe(
+      map(juegos => {
+        const totalJuegos = juegos.length;
+        const juegosGratis = juegos.filter(j => j.precio === 0).length;
+        const juegosPago = totalJuegos - juegosGratis;
+        const mejor = juegos.reduce((a, b) => a.rating > b.rating ? a : b);
+        const totalPrecio = juegos
+          .filter(j => j.precio > 0)
+          .reduce((sum, j) => sum + j.precio, 0);
+        const cantPago = juegos.filter(j => j.precio > 0).length;
+  
+        return {
+          totalJuegos,
+          juegosGratis,
+          juegosPago,
+          mejorRating: { nombre: mejor.nombre, rating: mejor.rating },
+          promedioPrecio: cantPago > 0 ? parseFloat((totalPrecio / cantPago).toFixed(2)) : 0
+        };
+      })
+    );
+  }
+  
 }

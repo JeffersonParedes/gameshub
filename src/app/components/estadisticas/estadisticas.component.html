@@ -1,0 +1,14 @@
+<h2>Estadísticas</h2>
+<ul>
+  <li>Total de juegos: {{ totalJuegos }}</li>
+  <li>Juegos gratuitos: {{ gratuitos }}</li>
+  <li>Juegos de pago: {{ dePago }}</li>
+  <li>
+    Juego con mejor rating:
+    {{ mejorJuego?.nombre }} ({{ mejorJuego?.rating | number:'1.1-2' }})
+  </li>
+  <li>
+    Precio promedio (solo juegos de pago):
+    {{ promedioPrecios | currency:'USD' }}
+  </li>
+</ul>
